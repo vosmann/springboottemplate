@@ -1,0 +1,46 @@
+
+SenzaInfo:
+  StackName: springboottemplate-server
+  Parameters:
+    - ImageVersion:
+        Description: "Docker image version of the Spring Boot template server."
+        Default: 1.0-SNAPSHOT
+
+SenzaComponents:
+
+  - Configuration:
+      Type: Senza::StupsAutoConfiguration
+
+  - AppServer:
+      Type: Senza::TaupageAutoScalingGroup
+      InstanceType: t2.micro
+      SecurityGroups:
+        - app-springboottemplate-server
+      IamRoles:
+        - app-springboottemplate-server
+      ElasticLoadBalancer: AppLoadBalancer
+      AssociatePublicIpAddress: false
+      TaupageConfig:
+        application_id: springboottemplate-server
+        scalyr_account_key: "" # Add key for Scalyr writing.
+        application_version: "{{Arguments.ImageVersion}}"
+        runtime: Docker
+        source: "vosmann/springboottemplate-server:{{Arguments.ImageVersion}}"
+        health_check_path: /health
+        ports:
+          10001: 10001
+        environment:
+          # Environment variable is recognized as "your.parameter" and overrrides the value in application.properties.
+          YOUR_PARAMETER: "{{Arguments.YourParameter}}"
+      AutoScaling:
+        Minimum: 1
+        Maximum: 1
+        MetricType: CPU
+
+  - AppLoadBalancer:
+      Type: Senza::WeightedDnsElasticLoadBalancer
+      HTTPPort: 10001
+      HealthCheckPath: /health
+      SecurityGroups:
+        - app-springboottemplate-server-lb
+      Scheme: internal
