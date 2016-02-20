@@ -10,9 +10,13 @@ This is an empty Spring Boot project. It helps bootstrap projects by providing:
 * Senza deployments to AWS
 * Stack creation-time parametrization
 
-To build, run:
+To build, do:
 
     mvn clean package
+
+You can run the program like this:
+
+    java -jar target/springboottemplate-1.0-SNAPSHOT.jar
 
 To create a Docker container, run:
 
